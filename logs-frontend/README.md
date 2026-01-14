@@ -1,90 +1,111 @@
-
-
-
 # Logs Viewer – Frontend (React + Tailwind)
 
-A React-based UI for browsing and searching web logs from the backend API.
+Web UI for browsing and searching logs exposed by the backend Logs API.
 
-
+---
 
 ## Tech Stack
-
 - React
 - React Router
 - Tailwind CSS
 - Fetch API
 
+---
 
+## Main Files (Frontend Logic)
 
-## Features
+### Entry Point
+`src/index.js`
+- Bootstraps the React app
+- Wraps the app with `BrowserRouter`
+- Loads global styles (`index.css`)
 
-- Search logs by client IP or hostname
-- Paginated results
-- Auto-refresh every 20 seconds
-- Clean layout with reusable components
-- Client-side routing
-- 404 page handling
+---
 
+### App & Routing
+`src/App.js`
+- Defines client-side routes
+- Redirects `/` → `/logs`
+- Handles 404 routes
 
+Routes:
+- `/logs` → Logs page
+- `*` → NotFound page
 
-## Pages & Components
+---
 
 ### Pages
 
-- `/logs` – Main logs view
-- `*` – NotFound page
+`src/pages/LogsPage.jsx`
+- Main logs screen
+- Manages search state (`q`)
+- Manages pagination state (`page`)
+- Calls backend API
+- Renders table and pagination
+
+`src/pages/NotFound.jsx`
+- Displays 404 page for unknown routes
+
+---
 
 ### Components
 
-- `Layout` – Global layout (header + container)
-- `LogsTable` – Displays logs in a table
-- `Pagination` – Page navigation controls
+`src/components/Layout.jsx`
+- Global layout wrapper
+- Header + centered content container
+
+`src/components/LogsTable.jsx`
+- Renders logs in a table
+- Handles empty state
+
+`src/components/Pagination.jsx`
+- Prev / Next pagination controls
+- Displays current page and total pages
+
+---
+
+### API Layer
+
+`src/api/logs.js`
+- Centralized API fetch logic
+- Calls backend endpoint:
+  - `GET http://127.0.0.1:8000/api/logs`
+- Handles HTTP errors
+
+---
+
+### Styling
+
+`src/index.css`
+- Tailwind directives
+- Global base styles
+
+`tailwind.config.js`
+- Tailwind configuration
+- Content paths
+
+`postcss.config.js`
+- PostCSS + Tailwind integration
+
+---
+
+## Features
+- Search by client IP or hostname
+- Paginated results
+- Auto-refresh every 20 seconds
+- Reusable components
+- Client-side routing
+- 404 handling
+
+---
+
+## API Usage
+
+Example:
+```js
+fetchLogs({ q: "5.123.144.95", page: 1 })
 
 
-
-## API Integration
-
-# The frontend fetches data from:
-
-GET http://127.0.0.1:8000/api/logs
-
-- Example request:
-
- fetchLogs({ q: "5.123.144.95", page: 1 })
-
-# Tailwind CSS
-
-- Tailwind is used for:
-
-    Layout
-
-    Spacing
-
-    Typography
-
-    Responsive design
-
-- Configured in:
-
-    tailwind.config.js
-
-    postcss.config.js
-
-    src/index.css
-
-# Routing
-
--Routing is handled via react-router-dom:
-
-<Route path="/logs" element={<LogsPage />} />
-<Route path="*" element={<NotFound />} />
-
-# Run Frontend
-
+## Run Frontend
 npm install
 npm start
-
-- Frontend will be available at:
-
-http://localhost:3000
-

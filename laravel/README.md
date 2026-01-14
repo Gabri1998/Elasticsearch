@@ -1,92 +1,84 @@
 # Logs API – Backend (Laravel + Elasticsearch)
 
-This service exposes a REST API for querying and paginating web logs stored in Elasticsearch.
+REST API for querying and paginating web logs stored in Elasticsearch.
 
-
+---
 
 ## Tech Stack
-
 - PHP 8.x
 - Laravel
-- Elasticsearch PHP Client (v8.x)
+- Elasticsearch PHP Client v8
 - Elasticsearch 8.11
-- Docker (for Elasticsearch & Kibana)
 
+---
 
+## Main Files (Backend Logic)
 
-## Features
+### Routes
+`routes/api.php`
+- Defines the public API endpoint
+- Exposes: `GET /api/logs`
 
-- Fetch logs from Elasticsearch
-- Search by:
-  - Client IP
-  - Hostname
-  - Elasticsearch document `_id`
-- Pagination support
-- CORS enabled for frontend access
-- Clean service-based architecture
+---
 
+### Controller
+`app/Http/Controllers/LogController.php`
+- Entry point for HTTP requests
+- Reads query parameters (`q`, `page`)
+- Delegates search logic to the service
+- Handles errors and returns JSON responses
 
+---
+
+### Service
+`app/Services/ElasticsearchService.php`
+- Encapsulates all Elasticsearch logic
+- Builds queries based on input:
+  - Client IP (`term` query)
+  - Hostname (`match` query)
+  - Document `_id` (`ids` query)
+- Handles pagination (`from`, `size`)
+- Communicates directly with Elasticsearch
+
+---
+
+### Configuration
+`config/elasticsearch.php`
+- Defines Elasticsearch hosts
+- Reads from `.env`
+
+`.env`
+- `ELASTICSEARCH_HOST=localhost:9200`
+
+---
+
+### CORS
+`config/cors.php`
+- Allows cross-origin requests from frontend
+- Enables React app to access the API
+
+---
 
 ## API Endpoint
 
-### GET `/api/logs`
+### GET /api/logs
 
-#### Query Parameters
+Query parameters:
+- `q` (string) – IP, hostname, or Elasticsearch document ID
+- `page` (int) – Page number (default: 1)
 
-| Name | Type | Description |
-
-| `q` | string | Search query (IP, hostname, or document ID) |
-| `page` | number | Page number (default: 1) |
-
-#### Example
-
+Example:
 ```bash
 curl "http://127.0.0.1:8000/api/logs?q=5.123.144.95&page=1"
 
+Response:
+
 {
-  "data": [
-    {
-      "_index": "web_logs",
-      "_id": "abc123",
-      "_source": {
-        "client": "5.123.144.95",
-        "hostname": "example.com"
-      }
-    }
-  ],
+  "data": [...],
   "total": 10000,
   "page": 1
 }
 
-Architecture Overview
-
-Controller
-Handles HTTP requests and responses.
-
-Service (ElasticsearchService)
-Encapsulates all Elasticsearch logic and query building.
-
-Config-based setup
-Elasticsearch host configured via .env.
-
-Configuration
-.env
-ELASTICSEARCH_HOST=localhost:9200
-
-CORS
-
-CORS is configured in:
-
-config/cors.php
-
-
-This allows requests from the frontend (React app).
-
-Run Backend
+# Run Backend
 composer install
 php artisan serve
-
-
-Server will be available at:
-
-http://127.0.0.1:8000
